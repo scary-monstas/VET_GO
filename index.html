@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vet-Go | AI Veterinary Assistant</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked.js for Markdown Parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            /* Light Mode Palette */
+            --primary-blue: #2D9CDB;
+            --primary-dark: #1A7FB5;
+            --secondary-blue: #E3F2FD;
+            --accent-cyan: #56CCF2;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --white: #ffffff;
+            --bg-gradient: linear-gradient(135deg, #E0F7FA 0%, #FFFFFF 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --border-color: #e0e0e0;
+        }
+
+        /* Dark Mode Variables */
+        body.dark-mode {
+            --primary-blue: #56CCF2;
+            --primary-dark: #2D9CDB;
+            --secondary-blue: #1e293b;
+            --accent-cyan: #2D9CDB;
+            --text-dark: #f1f5f9;
+            --text-light: #cbd5e1;
+            --white: #0f172a;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            --border-color: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        /* --- Navbar --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            background: transparent;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(45, 156, 219, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--text-light);
+            color: var(--text-dark);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2rem 5%;
+            min-height: 80vh;
+            position: relative;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 600px;
+            z-index: 2;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .hero-text span {
+            color: var(--primary-blue);
+        }
+
+        .hero-text p {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .hero-image-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            z-index: 1;
+        }
+
+        .float-card {
+            position: absolute;
+            background: var(--white);
+            padding: 1rem;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: float 4s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        .float-card i {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+        }
+
+        .fc-1 { top: 10%; left: -20px; }
+        .fc-2 { bottom: 10%; right: 10px; animation-delay: 2s; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* --- Services Section --- */
+        .services {
+            padding: 4rem 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .service-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border-left: 5px solid transparent;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            border-left: 5px solid var(--primary-blue);
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary-blue);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .icon-box i {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+        }
+
+        .service-card h3 {
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .service-card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-link {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- AI ASSISTANT SECTION --- */
+        .ai-section {
+            padding: 2rem 5% 6rem 5%;
+            scroll-margin-top: 2rem;
+        }
+
+        .ai-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .ai-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .ai-header p {
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .ai-interface-container {
+            display: flex;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: stretch;
+        }
+
+        /* Left Side: Upload Image */
+        .upload-container {
+            flex: 1;
+            min-width: 300px;
+            background: var(--white);
+            border: 1px solid var(--primary-blue);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .upload-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .drop-zone {
+            flex: 1;
+            border: 2px dashed var(--primary-blue);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--secondary-blue);
+            min-height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone:hover {
+            background: rgba(45, 156, 219, 0.1);
+        }
+
+        .drop-zone i {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .drop-zone p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .drop-zone .blue-link {
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .drop-zone img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            object-fit: contain;
+        }
+
+        .drop-zone.has-image i, 
+        .drop-zone.has-image p,
+        .drop-zone.has-image .blue-link {
+            opacity: 0.1;
+        }
+        
+        .drop-zone.has-image img {
+            display: block;
+        }
+
+        /* Right Side: Chat Window */
+        .chat-main-window {
+            flex: 2;
+            background: var(--white);
+            border: 1px solid var(--primary-blue);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .chat-window-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-window-header h4 {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #27AE60;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-text {
+            color: #27AE60;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .chat-content-area {
+            flex: 1;
+            padding: 2rem;
+            background: var(--white);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            min-height: 400px;
+            max-height: 600px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            margin: auto;
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--secondary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .empty-icon i {
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+        }
+
+        /* Messages */
+        .chat-msg {
+            max-width: 80%;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            line-height: 1.6;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .msg-bot {
+            background: var(--secondary-blue);
+            color: var(--text-dark);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .msg-user {
+            background: var(--primary-blue);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .msg-image-preview {
+            max-width: 150px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Input Area */
+        .chat-input-bar {
+            padding: 1.5rem;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            border: 1px solid var(--primary-blue);
+            border-radius: 15px;
+            margin: 0 1.5rem 1.5rem 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .chat-input-bar input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        .send-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .send-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* --- Markup Styles (Bold, Italic, Lists in Chat) --- */
+        .chat-msg p {
+            margin: 0 0 10px 0;
+        }
+        .chat-msg p:last-child {
+            margin: 0;
+        }
+        .chat-msg ul, .chat-msg ol {
+            margin: 0 0 10px 20px;
+        }
+        .chat-msg strong {
+            font-weight: 700;
+        }
+        .chat-msg em {
+            font-style: italic;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .ai-interface-container {
+                flex-direction: column;
+            }
+
+            .upload-container {
+                min-height: 150px;
+            }
+
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding-top: 6rem;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-image-container {
+                margin-top: 3rem;
+                width: 100%;
+            }
+        }
+
+.logs{
+border-radius:30px
+}
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">
+            <img src="logo.jpg" width="70px" class="logs">
+        </div>
+        <ul class="nav-links">
+            <li><a href="#">HOME</a></li>
+            <li><a href="#">AI</a></li>
+            <li><a href="#">CONTACT US</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <button class="btn btn-primary">Get Started</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-text">
+            <h1>We always provide <br><span>best service</span> for your pets</h1>
+            <p>Your pet's health is our top priority. Connect with our AI veterinarians and use assistant for instant guidance.</p>
+            <button class="btn btn-primary" onclick="scrollToAI()">Lets Go</button>
+        </div>
+        
+        <div class="hero-image-container">
+            <div class="float-card fc-1">
+                <i class="fa-solid fa-user-doctor"></i>
+                <div>
+                    <span style="font-size: 0.8rem; color: #888;">Availability</span>
+                    <h5 style="color: var(--text-dark);">24/7 Available</h5>
+                </div>
+            </div>
+            <div class="float-card fc-2">
+                <i class="fa-solid fa-heart-pulse"></i>
+                <div>
+                    <span style="font-size: 0.8rem; color: #888;">Health Check</span>
+                    <h5 style="color: var(--text-dark);">Image detection</h5>
+                </div>
+            </div>
+            
+            <img src="bg.jpg" alt="Happy Dogs" class="hero-img">
+        </div>
+    </section>
+
+    <!-- Services Cards -->
+    <section class="services">
+        <div class="service-card">
+            <div class="icon-box"><i class="fa-solid fa-truck-medical"></i></div>
+            <h3>Emergency Care</h3>
+            <p>Immediate support for critical pet health situations with AI triaging.</p>
+            <a href="#" class="service-link">Read More <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+
+        <div class="service-card" style="border-left: 5px solid var(--primary-blue);">
+            <div class="icon-box"><i class="fa-solid fa-calendar-check"></i></div>
+            <h3>Visual Health Analysis</h3>
+            <p>Upload photos of concerning symptoms for advanced AI-powered visual analysis and recommendations.</p>
+            <a href="#" class="service-link">Read More <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+
+        <div class="service-card">
+            <div class="icon-box"><i class="fa-solid fa-user-doctor"></i></div>
+            <h3>Expert Knowledge Base</h3>
+            <p>Access comprehensive veterinary knowledge, reviewed and approved by licensed veterinary professionals.</p>
+            <a href="#" class="service-link">Read More <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+    </section>
+
+    <!-- NEW AI ASSISTANT SECTION -->
+    <section id="ai-assistant" class="ai-section">
+        <div class="ai-header">
+            <h2>Meet Your AI Veterinary Assistant</h2>
+            <p>Experience compassionate, professional pet health guidance powered by advanced AI technology.</p>
+        </div>
+
+        <div class="ai-interface-container">
+            <!-- Left: Upload Box -->
+            <div class="upload-container">
+                <div class="upload-header">
+                    <span>Upload Image</span>
+                    <i class="fa-regular fa-image" style="color: var(--primary-blue);"></i>
+                </div>
+                <div class="drop-zone" id="drop-area">
+                    <input type="file" id="fileElem" accept="image/*" style="display:none" onchange="handleFiles(this.files)">
+                    <img id="preview-img" alt="Preview">
+                    <div id="drop-text-content">
+                        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                        <p>Drop Image Here<br>or <span class="blue-link">Click to Upload</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Chat Window -->
+            <div class="chat-main-window">
+                <div class="chat-window-header">
+                    <h4>Vetgo AI Assistant <span class="status-dot"></span> <span class="status-text">Online</span></h4>
+                </div>
+                
+                <!-- Chat Content -->
+                <div class="chat-content-area" id="chat-box">
+                    <!-- Empty State (Welcome) -->
+                    <div class="empty-state" id="empty-state">
+                        <div class="empty-icon">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <h3>Welcome to Vetgo AI Assistant!</h3>
+                        <p>Upload an image or describe your pet's symptoms to get started.</p>
+                    </div>
+                </div>
+
+                <!-- Input Bar -->
+                <div class="chat-input-bar">
+                    <input type="text" id="ai-input" placeholder="Enter text and press ENTER">
+                    <button class="send-btn" onclick="sendAiMessage()">
+                        <i class="fa-solid fa-paper-plane"></i> Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // --- 1. Dark/Light Mode Logic ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const icon = themeToggle.querySelector('i');
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if(body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
+
+        function scrollToAI() {
+            document.getElementById('ai-assistant').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- 2. Image Upload Logic ---
+        const dropArea = document.getElementById('drop-area');
+        const fileElem = document.getElementById('fileElem');
+        const previewImg = document.getElementById('preview-img');
+        let currentBase64Image = null;
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Highlight drop area
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.style.background = 'rgba(45, 156, 219, 0.2)', false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.style.background = '', false);
+        });
+
+        // Handle dropped files
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        // Handle click to upload
+        dropArea.addEventListener('click', () => {
+            fileElem.click();
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                if (!file.type.startsWith('image/')) return;
+
+                const reader = new FileReader();
+                reader.onloadend = function() {
+                    currentBase64Image = reader.result; 
+                    previewImg.src = currentBase64Image;
+                    dropArea.classList.add('has-image');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // --- 3. Chat Logic with Markup Support ---
+        const API_KEY = "AIzaSyB_Uk7jMfjfmUqnwHoYTe6cok8D3t9bGY0"; 
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+        
+        const chatBox = document.getElementById('chat-box');
+        const aiInput = document.getElementById('ai-input');
+        const emptyState = document.getElementById('empty-state');
+
+        // Allow Enter key
+        aiInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendAiMessage();
+            }
+        });
+
+        async function sendAiMessage() {
+            const text = aiInput.value.trim();
+            
+            // Validation
+            if (!text && !currentBase64Image) return;
+
+            // Remove empty state
+            if (emptyState) emptyState.style.display = 'none';
+
+            // 1. Display User Message (User messages usually don't need markdown, but we treat them as text)
+            appendMessage(text, 'msg-user', currentBase64Image);
+            
+            // Clear inputs
+            aiInput.value = '';
+            
+            // Store image for API call
+            const imageToSend = currentBase64Image;
+            
+            // Clear UI preview
+            currentBase64Image = null;
+            previewImg.src = '';
+            dropArea.classList.remove('has-image');
+
+            // 2. Show Loading
+            const loadingId = appendLoading('msg-bot');
+
+            try {
+                // 3. Construct Payload
+                const parts = [];
+                
+                if (text) {
+                    parts.push({ text: "You are Vet-Go, a professional veterinary AI assistant. Use bold and italics where appropriate to emphasize important advice. " + text });
+                } else {
+                    parts.push({ text: "You are Vet-Go. Please analyze this image for potential pet health issues. Use bold and italics to structure your response." });
+                }
+
+                if (imageToSend) {
+                    const base64Data = imageToSend.split(',')[1];
+                    const mimeType = imageToSend.split(';')[0].split(':')[1];
+                    parts.push({
+                        inline_data: {
+                            mime_type: mimeType,
+                            data: base64Data
+                        }
+                    });
+                }
+
+                const payload = {
+                    contents: [{ parts: parts }]
+                };
+
+                // 4. API Call
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                // 5. Remove Loading & Show Response
+                document.getElementById(loadingId).remove();
+
+                if (data.error) {
+                    appendMessage("Error: " + data.error.message, 'msg-bot');
+                } else {
+                    const botResponse = data.candidates[0].content.parts[0].text;
+                    // Append message with Markdown parsing enabled
+                    appendMessage(botResponse, 'msg-bot');
+                }
+
+            } catch (error) {
+                if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+                appendMessage("Connection error. Please try again.", 'msg-bot');
+                console.error(error);
+            }
+        }
+
+        // Updated appendMessage to support Markup
+        function appendMessage(text, className, imgSrc = null) {
+            const div = document.createElement('div');
+            div.className = `chat-msg ${className}`;
+            
+            let htmlContent = '';
+            
+            // Add image preview if exists
+            if (imgSrc) {
+                htmlContent += `<img src="${imgSrc}" class="msg-image-preview">`;
+            }
+            
+            // Parse text with Marked.js if text exists
+            if (text) {
+                // marked.parse returns HTML string (e.g., <p><strong>Bold</strong></p>)
+                const parsedText = marked.parse(text);
+                htmlContent += `<div>${parsedText}</div>`;
+            }
+            
+            div.innerHTML = htmlContent;
+
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function appendLoading(className) {
+            const div = document.createElement('div');
+            div.className = `chat-msg ${className}`;
+            div.innerText = "Analyzing...";
+            const id = 'load-' + Date.now();
+            div.id = id;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return id;
+        }
+    </script>
+</body>
+</html>
