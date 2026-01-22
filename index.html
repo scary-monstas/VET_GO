@@ -450,7 +450,8 @@
         }
 
         // --- AI Logic ---
-        const API_KEY = "AIzaSyB_Uk7jMfjfmUqnwHoYTe6cok8D3t9bGY0"; 
+        const API_KEY_BASE64 ="QUl6YVN5Q1NtbmhlLXZoOEF0eFdFcmVOMkkwVUZjVUp3OWQ5MUw4";
+        const API_KEY = atob(API_KEY_BASE64); 
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
         
         const chatBox = document.getElementById('chat-box');
@@ -540,4 +541,5 @@
     </script>
 </body>
 </html>
+
 
